@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socialize/modules/post/new_post_screen.dart';
 import 'package:socialize/shared/components/components.dart';
 import 'package:socialize/shared/cubit/home_cubit.dart';
+import 'package:socialize/shared/cubit/home_states.dart';
 import 'package:socialize/shared/styles/icon_broken.dart';
 
 class FeedsScreen extends StatelessWidget {
@@ -10,72 +12,84 @@ class FeedsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var model = HomeCubit.get(context).userModel;
-    return SingleChildScrollView(
-      physics: BouncingScrollPhysics(),
-      child: Column(
-        children: [
-          //if (model!.isEmailVerified == false) verificationBuilder(context),
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10.0,
-              vertical: 5.0,
-            ),
-            child: Container(
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 20.0,
-                    backgroundImage: NetworkImage(
-                        'https://image.freepik.com/free-photo/beautiful-smiling-girl-introduce-something-holding-hand_1258-19078.jpg'),
-                  ),
-                  SizedBox(width: 10.0),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () {
-                        navigateTo(context, NewPostScreen());
-                      },
+    return BlocConsumer<HomeCubit, HomeStates>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        var model = HomeCubit.get(context).userModel;
+
+        return model != null
+            ? SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Column(
+                  children: [
+                    //if (model!.isEmailVerified == false) verificationBuilder(context),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0,
+                        vertical: 5.0,
+                      ),
                       child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          borderRadius: BorderRadius.circular(25.0),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Text(
-                            'what\'s in your mind !!',
-                            style: Theme.of(context).textTheme.caption,
-                          ),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 20.0,
+                              backgroundImage: NetworkImage(model.image),
+                            ),
+                            SizedBox(width: 10.0),
+                            Expanded(
+                              child: InkWell(
+                                onTap: () {
+                                  navigateTo(context, NewPostScreen());
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(25.0),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Text(
+                                      'what\'s in your mind !!',
+                                      style:
+                                          Theme.of(context).textTheme.caption,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Card(
-            clipBehavior: Clip.antiAliasWithSaveLayer,
-            elevation: 10.0,
-            margin: EdgeInsets.all(8.0),
-            child: Image(
-              image: NetworkImage(
-                  'https://image.freepik.com/free-psd/city-food-billboard-mock-up_23-2149012701.jpg'),
-              fit: BoxFit.cover,
-              height: 200,
-              width: double.infinity,
-            ),
-          ),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            separatorBuilder: (context, index) => SizedBox(height: 10.0),
-            itemBuilder: (context, index) => _postItemBuilder(context),
-            itemCount: 10,
-          ),
-          SizedBox(height: 10.0),
-        ],
-      ),
+                    Card(
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
+                      elevation: 10.0,
+                      margin: EdgeInsets.all(8.0),
+                      child: Image(
+                        image: NetworkImage(
+                            'https://image.freepik.com/free-psd/city-food-billboard-mock-up_23-2149012701.jpg'),
+                        fit: BoxFit.cover,
+                        height: 200,
+                        width: double.infinity,
+                      ),
+                    ),
+                    ListView.separated(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 10.0),
+                      itemBuilder: (context, index) =>
+                          _postItemBuilder(context),
+                      itemCount: 10,
+                    ),
+                    SizedBox(height: 10.0),
+                  ],
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              );
+      },
     );
   }
 

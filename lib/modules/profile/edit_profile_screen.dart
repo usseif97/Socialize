@@ -1,23 +1,30 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:socialize/shared/components/components.dart';
 import 'package:socialize/shared/cubit/home_cubit.dart';
 import 'package:socialize/shared/cubit/home_states.dart';
 import 'package:socialize/shared/styles/icon_broken.dart';
 
 class EditProfileScreen extends StatelessWidget {
-  const EditProfileScreen({Key? key}) : super(key: key);
+  EditProfileScreen({Key? key}) : super(key: key);
+  final nameController = TextEditingController();
+  final bioController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var nameController = TextEditingController();
-        var bioController = TextEditingController();
-
         var userModel = HomeCubit.get(context).userModel;
+        var profileImage = HomeCubit.get(context).profileImage;
+        var coverImage = HomeCubit.get(context).coverImage;
+
+        nameController.text = userModel!.name;
+        bioController.text = userModel.bio;
         return Scaffold(
           appBar: AppBar(
             title: Padding(
@@ -33,6 +40,10 @@ class EditProfileScreen extends StatelessWidget {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
+                  if (state is HomeUserUpdateLoadingState)
+                    LinearProgressIndicator(),
+                  if (state is HomeUserUpdateLoadingState)
+                    SizedBox(height: 10.0),
                   Container(
                     height: 180.0,
                     child: Stack(
@@ -52,13 +63,18 @@ class EditProfileScreen extends StatelessWidget {
                                     topRight: Radius.circular(5.0),
                                   ),
                                   image: DecorationImage(
-                                    image: NetworkImage(userModel!.cover),
+                                    image: coverImage == null
+                                        ? NetworkImage(userModel.cover)
+                                        : FileImage(coverImage)
+                                            as ImageProvider,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  HomeCubit.get(context).pickCoverImage();
+                                },
                                 icon: CircleAvatar(
                                   radius: 20.0,
                                   child: Icon(IconBroken.Camera),
@@ -74,11 +90,15 @@ class EditProfileScreen extends StatelessWidget {
                               radius: 51.0,
                               child: CircleAvatar(
                                 radius: 50.0,
-                                backgroundImage: NetworkImage(userModel.image),
+                                backgroundImage: profileImage == null
+                                    ? NetworkImage(userModel.image)
+                                    : FileImage(profileImage) as ImageProvider,
                               ),
                             ),
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                HomeCubit.get(context).pickProfileImage();
+                              },
                               icon: CircleAvatar(
                                 radius: 12.0,
                                 child: Icon(
@@ -119,7 +139,12 @@ class EditProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       OutlinedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          HomeCubit.get(context).updateUser(
+                            name: nameController.text,
+                            bio: bioController.text,
+                          );
+                        },
                         child: Text(
                           'Update',
                         ),

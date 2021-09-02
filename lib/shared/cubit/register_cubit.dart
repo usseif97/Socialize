@@ -56,8 +56,7 @@ class RegisterCubit extends Cubit<RegisterStates> {
       bio: 'write your bio ..',
       image:
           'https://cdn2.vectorstock.com/i/1000x1000/59/71/purple-male-gay-bisexual-profile-picture-vector-22975971.jpg',
-      cover:
-          'https://images.unsplash.com/photo-1504805572947-34fad45aed93?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y292ZXIlMjBwaG90b3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&w=1000&q=80',
+      cover: 'https://nanoguard.in/wp-content/uploads/2019/09/pic.jpg',
       isEmailVerified: false,
     );
 
