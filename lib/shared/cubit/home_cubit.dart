@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:socialize/models/comment_model.dart';
+import 'package:socialize/models/like_model.dart';
 import 'package:socialize/models/post_model.dart';
 import 'package:socialize/models/user_model.dart';
 import 'package:socialize/modules/chat/chat_screen.dart';
@@ -324,14 +326,19 @@ class HomeCubit extends Cubit<HomeStates> {
 
   // handling like Post
   void likePost(String postID, int index) {
+    LikeModel model = LikeModel(
+      name: userModel!.name,
+      image: userModel!.image,
+      uID: userModel!.uID,
+      like: true,
+    );
     FirebaseFirestore.instance
         .collection(POSTS)
         .doc(postID)
         .collection(LIKES)
         .doc(userModel!.uID)
-        .set({
-      'like': true,
-    }).then((value) {
+        .set(model.toMap())
+        .then((value) {
       likes[index]++;
       emit(HomeLikePostSuccessState());
     }).catchError((error) {
@@ -341,16 +348,21 @@ class HomeCubit extends Cubit<HomeStates> {
 
   // handling comment on Post
   void commentOnPost(String postID, String comment, int index) {
+    CommentModel model = CommentModel(
+      name: userModel!.name,
+      image: userModel!.image,
+      uID: userModel!.uID,
+      comment: comment,
+    );
+
     FirebaseFirestore.instance
         .collection(POSTS)
         .doc(postID)
         .collection(COMMENTS)
         .doc(userModel!.uID)
-        .set({
-      'comment': comment,
-    }).then((value) {
+        .set(model.toMap())
+        .then((value) {
       comments[index]++;
-
       emit(HomeCommentPostSuccessState());
     }).catchError((error) {
       emit(HomeCommentPostErrorState(error.toString()));

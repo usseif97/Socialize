@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:socialize/layout/engagmnet_layout.dart';
 import 'package:socialize/models/post_model.dart';
 import 'package:socialize/models/user_model.dart';
 import 'package:socialize/modules/post/new_post_screen.dart';
@@ -164,11 +165,17 @@ class FeedsScreen extends StatelessWidget {
               SizedBox(height: 5.0),
               // text caption
               if (model.postText != '')
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 5.0),
-                  child: Text(
-                    model.postText,
-                    style: Theme.of(context).textTheme.subtitle1,
+                InkWell(
+                  onTap: () {
+                    navigateTo(context,
+                        EngagmentLayout(HomeCubit.get(context).postsId[index]));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 5.0),
+                    child: Text(
+                      model.postText,
+                      style: Theme.of(context).textTheme.subtitle1,
+                    ),
                   ),
                 ),
               // hastags caption
@@ -226,13 +233,19 @@ class FeedsScreen extends StatelessWidget {
               ),*/
               // image caption
               if (model.postImage != '')
-                Padding(
-                  padding: const EdgeInsets.only(top: 5.0),
-                  child: Image(
-                    image: NetworkImage(model.postImage),
-                    fit: BoxFit.fill,
-                    height: 200.0,
-                    width: double.infinity,
+                InkWell(
+                  onTap: () {
+                    navigateTo(context,
+                        EngagmentLayout(HomeCubit.get(context).postsId[index]));
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 5.0),
+                    child: Image(
+                      image: NetworkImage(model.postImage),
+                      fit: BoxFit.fill,
+                      height: 200.0,
+                      width: double.infinity,
+                    ),
                   ),
                 ),
               // engagment
