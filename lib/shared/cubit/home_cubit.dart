@@ -252,6 +252,7 @@ class HomeCubit extends Cubit<HomeStates> {
           postImage: value,
         );
         removePostImage();
+        getPosts();
       }).catchError((error) {
         emit(HomePostImageUploadErrorState(error.toString()));
       });
@@ -285,9 +286,74 @@ class HomeCubit extends Cubit<HomeStates> {
         .collection(POSTS)
         .add(model.toMap())
         .then((value) {
+      getPosts();
       emit(HomeCreateNewPostSuccessState());
     }).catchError((error) {
       emit(HomeCreateNewPostErrorState(error.toString()));
+    });
+  }
+
+  // get all Posts with likes & comments
+  late List<PostModel> posts;
+  late List<String> postsId;
+  late List<int> likes;
+  late List<int> comments;
+  void getPosts() {
+    posts = [];
+    postsId = [];
+    likes = [];
+    comments = [];
+    emit(HomeGetPostsLoadingState());
+    FirebaseFirestore.instance.collection(POSTS).get().then((value) async {
+      value.docs.forEach((element) async {
+        var elementLikes = await element.reference.collection(LIKES).get();
+        var elementComments =
+            await element.reference.collection(COMMENTS).get();
+        likes.add(elementLikes.docs.length);
+        comments.add(elementComments.docs.length);
+        postsId.add(element.id);
+        posts.add(PostModel.fromJson(element.data()));
+      });
+      await Future.delayed(const Duration(seconds: 3), () {
+        emit(HomeGetPostsSuccessState());
+      });
+    }).catchError((error) {
+      emit(HomeGetPostsErrorState(error.toString()));
+    });
+  }
+
+  // handling like Post
+  void likePost(String postID, int index) {
+    FirebaseFirestore.instance
+        .collection(POSTS)
+        .doc(postID)
+        .collection(LIKES)
+        .doc(userModel!.uID)
+        .set({
+      'like': true,
+    }).then((value) {
+      likes[index]++;
+      emit(HomeLikePostSuccessState());
+    }).catchError((error) {
+      emit(HomeLikePostErrorState(error.toString()));
+    });
+  }
+
+  // handling comment on Post
+  void commentOnPost(String postID, String comment, int index) {
+    FirebaseFirestore.instance
+        .collection(POSTS)
+        .doc(postID)
+        .collection(COMMENTS)
+        .doc(userModel!.uID)
+        .set({
+      'comment': comment,
+    }).then((value) {
+      comments[index]++;
+
+      emit(HomeCommentPostSuccessState());
+    }).catchError((error) {
+      emit(HomeCommentPostErrorState(error.toString()));
     });
   }
 }

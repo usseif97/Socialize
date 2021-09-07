@@ -5,7 +5,7 @@ class HomeIntialState extends HomeStates {}
 // Bottom Navigation Bar
 class HomeChangeBottomNavigationBarState extends HomeStates {}
 
-// New Post
+// New Post Screen
 class HomeNewPostState extends HomeStates {}
 
 // Get User Data
@@ -84,4 +84,31 @@ class HomeCreateNewPostErrorState extends HomeStates {
   HomeCreateNewPostErrorState(this.error);
 }
 
+// Remove Post Image
 class HomeRemovePostImageState extends HomeStates {}
+
+// Get Posts
+class HomeGetPostsLoadingState extends HomeStates {}
+
+class HomeGetPostsSuccessState extends HomeStates {}
+
+class HomeGetPostsErrorState extends HomeStates {
+  final String error;
+  HomeGetPostsErrorState(this.error);
+}
+
+// Like Post
+class HomeLikePostSuccessState extends HomeStates {}
+
+class HomeLikePostErrorState extends HomeStates {
+  final String error;
+  HomeLikePostErrorState(this.error);
+}
+
+// Comment on Post
+class HomeCommentPostSuccessState extends HomeStates {}
+
+class HomeCommentPostErrorState extends HomeStates {
+  final String error;
+  HomeCommentPostErrorState(this.error);
+}

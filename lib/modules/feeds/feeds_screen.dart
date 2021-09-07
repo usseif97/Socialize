@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:socialize/models/post_model.dart';
+import 'package:socialize/models/user_model.dart';
 import 'package:socialize/modules/post/new_post_screen.dart';
 import 'package:socialize/shared/components/components.dart';
 import 'package:socialize/shared/cubit/home_cubit.dart';
@@ -8,16 +10,18 @@ import 'package:socialize/shared/cubit/home_states.dart';
 import 'package:socialize/shared/styles/icon_broken.dart';
 
 class FeedsScreen extends StatelessWidget {
-  const FeedsScreen({Key? key}) : super(key: key);
+  FeedsScreen({Key? key}) : super(key: key);
 
+  final commentController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
       listener: (context, state) {},
       builder: (context, state) {
-        var model = HomeCubit.get(context).userModel;
+        var userModel = HomeCubit.get(context).userModel;
+        var posts = HomeCubit.get(context).posts;
 
-        return model != null
+        return userModel != null && posts.length > 0
             ? SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
                 child: Column(
@@ -33,7 +37,7 @@ class FeedsScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 20.0,
-                              backgroundImage: NetworkImage(model.image),
+                              backgroundImage: NetworkImage(userModel.image),
                             ),
                             SizedBox(width: 10.0),
                             Expanded(
@@ -61,7 +65,7 @@ class FeedsScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Card(
+                    /*Card(
                       clipBehavior: Clip.antiAliasWithSaveLayer,
                       elevation: 10.0,
                       margin: EdgeInsets.all(8.0),
@@ -72,15 +76,19 @@ class FeedsScreen extends StatelessWidget {
                         height: 200,
                         width: double.infinity,
                       ),
-                    ),
+                    ),*/
                     ListView.separated(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),
                       separatorBuilder: (context, index) =>
                           SizedBox(height: 10.0),
-                      itemBuilder: (context, index) =>
-                          _postItemBuilder(context),
-                      itemCount: 10,
+                      itemBuilder: (context, index) => _postItemBuilder(
+                        context,
+                        posts[index],
+                        userModel,
+                        index,
+                      ),
+                      itemCount: posts.length,
                     ),
                     SizedBox(height: 10.0),
                   ],
@@ -93,21 +101,27 @@ class FeedsScreen extends StatelessWidget {
     );
   }
 
-  Widget _postItemBuilder(BuildContext context) => Card(
+  Widget _postItemBuilder(
+    BuildContext context,
+    PostModel model,
+    UserModel userModel,
+    int index,
+  ) =>
+      Card(
         clipBehavior: Clip.antiAliasWithSaveLayer,
-        elevation: 5.0,
+        elevation: 1.0,
         margin: EdgeInsets.symmetric(horizontal: 8.0),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // profile
               Row(
                 children: [
                   CircleAvatar(
                     radius: 20.0,
-                    backgroundImage: NetworkImage(
-                        'https://image.freepik.com/free-photo/beautiful-smiling-girl-introduce-something-holding-hand_1258-19078.jpg'),
+                    backgroundImage: NetworkImage(model.image),
                   ),
                   SizedBox(width: 15.0),
                   Expanded(
@@ -117,7 +131,7 @@ class FeedsScreen extends StatelessWidget {
                         Row(
                           children: [
                             Text(
-                              'Usseif Ahmed',
+                              model.name,
                               style: TextStyle(fontSize: 12.0, height: 1.4),
                             ),
                             SizedBox(width: 5.0),
@@ -129,7 +143,7 @@ class FeedsScreen extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          'January 21, 2021 at 12:00 am',
+                          model.date,
                           style: Theme.of(context)
                               .textTheme
                               .caption!
@@ -149,12 +163,16 @@ class FeedsScreen extends StatelessWidget {
               ),
               SizedBox(height: 5.0),
               // text caption
-              Text(
-                'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book',
-                style: Theme.of(context).textTheme.subtitle1,
-              ),
+              if (model.postText != '')
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 5.0),
+                  child: Text(
+                    model.postText,
+                    style: Theme.of(context).textTheme.subtitle1,
+                  ),
+                ),
               // hastags caption
-              Container(
+              /*Container(
                 width: double.infinity,
                 child: Wrap(
                   children: [
@@ -205,23 +223,22 @@ class FeedsScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
+              ),*/
               // image caption
-              Card(
-                clipBehavior: Clip.antiAliasWithSaveLayer,
-                elevation: 5.0,
-                margin: EdgeInsets.all(8.0),
-                child: Image(
-                  image: NetworkImage(
-                      'https://image.freepik.com/free-psd/city-food-billboard-mock-up_23-2149012701.jpg'),
-                  fit: BoxFit.cover,
-                  height: 120.0,
-                  width: double.infinity,
+              if (model.postImage != '')
+                Padding(
+                  padding: const EdgeInsets.only(top: 5.0),
+                  child: Image(
+                    image: NetworkImage(model.postImage),
+                    fit: BoxFit.fill,
+                    height: 200.0,
+                    width: double.infinity,
+                  ),
                 ),
-              ),
               // engagment
               Row(
                 children: [
+                  // likes
                   Expanded(
                     child: InkWell(
                       onTap: () {},
@@ -236,7 +253,7 @@ class FeedsScreen extends StatelessWidget {
                             ),
                             SizedBox(width: 2.0),
                             Text(
-                              '120',
+                              HomeCubit.get(context).likes[index].toString(),
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ],
@@ -244,6 +261,7 @@ class FeedsScreen extends StatelessWidget {
                       ),
                     ),
                   ),
+                  // comments
                   Expanded(
                     child: InkWell(
                       onTap: () {},
@@ -259,7 +277,7 @@ class FeedsScreen extends StatelessWidget {
                             ),
                             SizedBox(width: 2.0),
                             Text(
-                              '521 comments',
+                              '${HomeCubit.get(context).comments[index]} comments',
                               style: Theme.of(context).textTheme.caption,
                             ),
                           ],
@@ -269,6 +287,8 @@ class FeedsScreen extends StatelessWidget {
                   ),
                 ],
               ),
+              // Comments
+
               Padding(
                 padding: const EdgeInsetsDirectional.only(bottom: 10.0),
                 child: defaultSeperator(),
@@ -276,27 +296,38 @@ class FeedsScreen extends StatelessWidget {
               // interact
               Row(
                 children: [
+                  CircleAvatar(
+                    radius: 15.0,
+                    backgroundImage: NetworkImage(userModel.image),
+                  ),
+                  SizedBox(width: 10.0),
                   Expanded(
-                    child: InkWell(
-                      onTap: () {},
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            radius: 15.0,
-                            backgroundImage: NetworkImage(
-                                'https://image.freepik.com/free-photo/beautiful-smiling-girl-introduce-something-holding-hand_1258-19078.jpg'),
-                          ),
-                          SizedBox(width: 10.0),
-                          Text(
-                            'write a comment ...',
-                            style: Theme.of(context).textTheme.caption,
-                          )
-                        ],
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 5.0),
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: 'write a comment ...',
+                          border: InputBorder.none,
+                        ),
+                        onFieldSubmitted: (s) {
+                          HomeCubit.get(context).commentOnPost(
+                            HomeCubit.get(context).postsId[index],
+                            commentController.text,
+                            index,
+                          );
+                        },
+                        controller: commentController,
+                        maxLines: 1,
                       ),
                     ),
                   ),
                   InkWell(
-                    onTap: () {},
+                    onTap: () {
+                      HomeCubit.get(context).likePost(
+                        HomeCubit.get(context).postsId[index],
+                        index,
+                      );
+                    },
                     child: Padding(
                       padding: const EdgeInsets.all(3.0),
                       child: Row(

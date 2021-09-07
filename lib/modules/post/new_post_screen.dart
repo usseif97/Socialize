@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:socialize/shared/components/components.dart';
 import 'package:socialize/shared/cubit/home_cubit.dart';
 import 'package:socialize/shared/cubit/home_states.dart';
+import 'package:socialize/shared/network/local/cache_helper.dart';
 import 'package:socialize/shared/styles/icon_broken.dart';
 
 class NewPostScreen extends StatelessWidget {
@@ -14,10 +15,14 @@ class NewPostScreen extends StatelessWidget {
     return BlocConsumer<HomeCubit, HomeStates>(
       listener: (context, state) {},
       builder: (context, state) {
+        var text = CacheHelper.getData(key: 'postText');
+
         var model = HomeCubit.get(context).userModel;
         var postImage = HomeCubit.get(context).postImage;
 
         var textController = TextEditingController();
+
+        if (text != null) textController.text = text;
 
         return model != null
             ? Scaffold(
@@ -77,15 +82,23 @@ class NewPostScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        SizedBox(height: 5.0),
+                        SizedBox(height: 10.0),
                         Container(
                           height: 200.0,
-                          child: TextFormField(
-                            decoration: InputDecoration(
-                              hintText: 'what\'s in your mind ...',
-                              border: InputBorder.none,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(25.0),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: TextFormField(
+                              decoration: InputDecoration(
+                                hintText: 'what\'s in your mind ...',
+                                border: InputBorder.none,
+                              ),
+                              controller: textController,
+                              maxLines: 10,
                             ),
-                            controller: textController,
                           ),
                         ),
                         SizedBox(
@@ -131,7 +144,12 @@ class NewPostScreen extends StatelessWidget {
                                 children: [
                                   TextButton(
                                     onPressed: () {
-                                      HomeCubit.get(context).pickPostImage();
+                                      CacheHelper.saveData(
+                                        key: 'postText',
+                                        value: textController.text,
+                                      ).then((value) {
+                                        HomeCubit.get(context).pickPostImage();
+                                      });
                                     },
                                     child: Row(
                                       children: [
@@ -169,7 +187,10 @@ class NewPostScreen extends StatelessWidget {
                                         label: 'Success',
                                         state: snackBarStates.SUCCESS,
                                       );
-                                      Navigator.pop(context);
+                                      CacheHelper.removeData(key: 'postText')
+                                          .then((value) {
+                                        Navigator.pop(context);
+                                      });
                                     },
                                     child: Row(
                                       children: [
