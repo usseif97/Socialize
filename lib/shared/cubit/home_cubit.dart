@@ -1,7 +1,7 @@
 import 'dart:io';
-
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +9,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:socialize/models/comment_model.dart';
 import 'package:socialize/models/like_model.dart';
+import 'package:socialize/models/message_model.dart';
 import 'package:socialize/models/post_model.dart';
 import 'package:socialize/models/user_model.dart';
 import 'package:socialize/modules/chat/chat_screen.dart';
@@ -66,6 +67,7 @@ class HomeCubit extends Cubit<HomeStates> {
     ),
   ];
   void changeIndex(int index) {
+    if (index == 1) getAllUsers();
     if (index == 2)
       emit(HomeNewPostState());
     else {
@@ -79,10 +81,21 @@ class HomeCubit extends Cubit<HomeStates> {
     emit(HomeChangeBottomNavigationBarState());
   }
 
+  // handle Firebase Logout
+  void userLogout() {
+    emit(HomeLogoutLoadingState());
+    FirebaseAuth.instance.signOut().then((value) {
+      emit(HomeLogoutSuccessState());
+    }).catchError((error) {
+      emit(HomeLogoutErrorState(error.toString()));
+    });
+  }
+
   // Get User Data
   UserModel? userModel;
   void getUserData() {
     emit(HomeGetUserLoadingState());
+    //print('uID: $uID');
     FirebaseFirestore.instance.collection(USERS).doc(uID).get().then((value) {
       userModel = UserModel.fromJson(value.data());
       emit(HomeGetUserSuccessState());
@@ -354,7 +367,6 @@ class HomeCubit extends Cubit<HomeStates> {
       uID: userModel!.uID,
       comment: comment,
     );
-
     FirebaseFirestore.instance
         .collection(POSTS)
         .doc(postID)
@@ -366,6 +378,88 @@ class HomeCubit extends Cubit<HomeStates> {
       emit(HomeCommentPostSuccessState());
     }).catchError((error) {
       emit(HomeCommentPostErrorState(error.toString()));
+    });
+  }
+
+  // Get all users
+  late List<UserModel> allUsers = [];
+  void getAllUsers() {
+    if (allUsers.length == 0) {
+      emit(HomeGetAllUsersLoadingState());
+      FirebaseFirestore.instance.collection(USERS).get().then((value) {
+        value.docs.forEach((element) {
+          if (element.data()['uID'] != userModel!.uID)
+            allUsers.add(UserModel.fromJson(element.data()));
+        });
+        emit(HomeGetAllUsersSuccessState());
+      }).catchError((error) {
+        emit(HomeGetAllUsersErrorState(error.toString()));
+      });
+    }
+  }
+
+  // Send Message
+  void sendMessage({
+    required String receiverId,
+    required String dateTime,
+    required String text,
+  }) {
+    MessageModel model = MessageModel(
+      text: text,
+      senderId: userModel!.uID,
+      receiverID: receiverId,
+      dateTime: dateTime,
+    );
+
+    // set my chat
+    FirebaseFirestore.instance
+        .collection(USERS)
+        .doc(userModel!.uID)
+        .collection(CHATS)
+        .doc(receiverId)
+        .collection(MESSAGES)
+        .add(model.toMap())
+        .then((value) {
+      emit(HomeSendMessageSuccessState());
+    }).catchError((error) {
+      emit(HomeSendMessageErrorState(error.toString()));
+    });
+
+    // set receiver chat
+    FirebaseFirestore.instance
+        .collection(USERS)
+        .doc(receiverId)
+        .collection(CHATS)
+        .doc(userModel!.uID)
+        .collection(MESSAGES)
+        .add(model.toMap())
+        .then((value) {
+      emit(HomeSendMessageSuccessState());
+    }).catchError((error) {
+      emit(HomeSendMessageErrorState(error.toString()));
+    });
+  }
+
+  // Get all Messages
+  List<MessageModel> messages = [];
+  void getMessages({
+    required String receiverId,
+  }) {
+    emit(HomeGetAllMessagesLoadingState());
+    FirebaseFirestore.instance
+        .collection(USERS)
+        .doc(userModel!.uID)
+        .collection(CHATS)
+        .doc(receiverId)
+        .collection(MESSAGES)
+        .orderBy('dateTime')
+        .snapshots()
+        .listen((event) {
+      messages = [];
+      event.docs.forEach((element) {
+        messages.add(MessageModel.fromJson(element.data()));
+      });
+      emit(HomeGetAllMessagesSuccessState());
     });
   }
 }

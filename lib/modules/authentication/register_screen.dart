@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socialize/layout/home_layout.dart';
 import 'package:socialize/shared/components/components.dart';
 import 'package:socialize/shared/components/constants.dart';
+import 'package:socialize/shared/cubit/home_cubit.dart';
 import 'package:socialize/shared/cubit/register_cubit.dart';
 import 'package:socialize/shared/cubit/register_states.dart';
 import 'package:socialize/shared/network/local/cache_helper.dart';
@@ -31,6 +32,9 @@ class RegisterScreen extends StatelessWidget {
               value: state.uid,
             ).then((value) {
               uID = state.uid;
+              HomeCubit()
+                ..getUserData()
+                ..getPosts();
               navigateToAndFinish(context, HomeLayout());
             });
             // Register Fall

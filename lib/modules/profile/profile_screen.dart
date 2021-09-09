@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:socialize/modules/authentication/login_screen.dart';
 import 'package:socialize/modules/profile/edit_profile_screen.dart';
 import 'package:socialize/shared/components/components.dart';
 import 'package:socialize/shared/cubit/home_cubit.dart';
 import 'package:socialize/shared/cubit/home_states.dart';
+import 'package:socialize/shared/network/local/cache_helper.dart';
 import 'package:socialize/shared/styles/icon_broken.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -13,7 +15,24 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        // Logout Success
+        if (state is HomeLogoutSuccessState) {
+          CacheHelper.removeData(
+            key: 'uid',
+          ).then((value) {
+            navigateToAndFinish(context, LoginScreen());
+          });
+          // Logout Fall
+        } else if (state is HomeLogoutErrorState) {
+          showSnackBar(
+            context: context,
+            content: state.error,
+            label: 'Error',
+            state: snackBarStates.ERROR,
+          );
+        }
+      },
       builder: (context, state) {
         var userModel = HomeCubit.get(context).userModel;
         return Scaffold(
@@ -170,6 +189,14 @@ class ProfileScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+                OutlinedButton(
+                  onPressed: () {
+                    HomeCubit.get(context).userLogout();
+                  },
+                  child: Text(
+                    'Log Out',
+                  ),
                 ),
               ],
             ),

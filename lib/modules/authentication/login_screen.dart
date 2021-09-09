@@ -7,6 +7,7 @@ import 'package:socialize/layout/home_layout.dart';
 import 'package:socialize/modules/authentication/register_screen.dart';
 import 'package:socialize/shared/components/components.dart';
 import 'package:socialize/shared/components/constants.dart';
+import 'package:socialize/shared/cubit/home_cubit.dart';
 import 'package:socialize/shared/cubit/login_cubit.dart';
 import 'package:socialize/shared/cubit/login_states.dart';
 import 'package:socialize/shared/network/local/cache_helper.dart';
@@ -33,6 +34,10 @@ class LoginScreen extends StatelessWidget {
               value: state.uid,
             ).then((value) {
               uID = state.uid;
+              print('uID: $uID');
+              HomeCubit()
+                ..getUserData()
+                ..getPosts();
               navigateToAndFinish(context, HomeLayout());
             });
             // Login Fall

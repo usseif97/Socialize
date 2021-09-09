@@ -8,6 +8,17 @@ class HomeChangeBottomNavigationBarState extends HomeStates {}
 // New Post Screen
 class HomeNewPostState extends HomeStates {}
 
+// User Logout
+class HomeLogoutLoadingState extends HomeStates {}
+
+class HomeLogoutSuccessState extends HomeStates {}
+
+class HomeLogoutErrorState extends HomeStates {
+  final String error;
+
+  HomeLogoutErrorState(this.error);
+}
+
 // Get User Data
 class HomeGetUserLoadingState extends HomeStates {}
 
@@ -16,6 +27,16 @@ class HomeGetUserSuccessState extends HomeStates {}
 class HomeGetUserErrorState extends HomeStates {
   final String error;
   HomeGetUserErrorState(this.error);
+}
+
+// Get All Users Data
+class HomeGetAllUsersLoadingState extends HomeStates {}
+
+class HomeGetAllUsersSuccessState extends HomeStates {}
+
+class HomeGetAllUsersErrorState extends HomeStates {
+  final String error;
+  HomeGetAllUsersErrorState(this.error);
 }
 
 // Profile Image Picker
@@ -112,3 +133,16 @@ class HomeCommentPostErrorState extends HomeStates {
   final String error;
   HomeCommentPostErrorState(this.error);
 }
+
+// Send Message
+class HomeSendMessageSuccessState extends HomeStates {}
+
+class HomeSendMessageErrorState extends HomeStates {
+  final String error;
+  HomeSendMessageErrorState(this.error);
+}
+
+// Get All Messages
+class HomeGetAllMessagesLoadingState extends HomeStates {}
+
+class HomeGetAllMessagesSuccessState extends HomeStates {}

@@ -30,7 +30,7 @@ class LikesScreen extends StatelessWidget {
                     itemCount: likeList.length,
                   )
                 : Center(
-                    child: Text('No Likes'),
+                    child: Text('No Likes !!'),
                   );
       },
     );

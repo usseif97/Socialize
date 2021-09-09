@@ -21,16 +21,13 @@ class CommentsScreen extends StatelessWidget {
               )
             : commentList.length > 0
                 ? ListView.separated(
-                    itemBuilder: (context, index) {
-                      return _buildItem(commentList[index], context);
-                    },
-                    separatorBuilder: (context, index) {
-                      return defaultSeperator();
-                    },
+                    itemBuilder: (context, index) =>
+                        _buildItem(commentList[index], context),
+                    separatorBuilder: (context, index) => defaultSeperator(),
                     itemCount: commentList.length,
                   )
                 : Center(
-                    child: Text('No Comments'),
+                    child: Text('No Comments !!'),
                   );
       },
     );
