@@ -43,6 +43,7 @@ class CommentsScreen extends StatelessWidget {
             ),
             SizedBox(width: 10.0),
             Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   model.name,

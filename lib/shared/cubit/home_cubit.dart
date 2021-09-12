@@ -267,7 +267,7 @@ class HomeCubit extends Cubit<HomeStates> {
           postImage: value,
         );
         removePostImage();
-        getPosts();
+        //getPosts();
       }).catchError((error) {
         emit(HomePostImageUploadErrorState(error.toString()));
       });

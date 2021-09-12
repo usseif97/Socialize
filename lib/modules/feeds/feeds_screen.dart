@@ -328,6 +328,7 @@ class FeedsScreen extends StatelessWidget {
                             commentController.text,
                             index,
                           );
+                          commentController.text = '';
                         },
                         controller: commentController,
                         maxLines: 1,
