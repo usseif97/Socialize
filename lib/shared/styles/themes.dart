@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 ThemeData lightTheme = ThemeData(
@@ -34,17 +35,17 @@ ThemeData lightTheme = ThemeData(
     backgroundColor: Colors.deepOrange,
   ),
   textTheme: TextTheme(
-    bodyText1: TextStyle(
+    bodyText1: GoogleFonts.getFont('McLaren').copyWith(
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    bodyText2: TextStyle(
+    bodyText2: GoogleFonts.getFont('McLaren').copyWith(
       fontSize: 15.0,
       fontWeight: FontWeight.bold,
       color: Colors.black,
     ),
-    subtitle1: TextStyle(
+    subtitle1: GoogleFonts.getFont('McLaren').copyWith(
       fontSize: 14.0,
       fontWeight: FontWeight.w600,
       color: Colors.black,
@@ -86,17 +87,17 @@ ThemeData darkTheme = ThemeData(
     backgroundColor: Colors.deepOrange,
   ),
   textTheme: TextTheme(
-    bodyText1: TextStyle(
+    bodyText1: GoogleFonts.getFont('McLaren').copyWith(
       fontSize: 18.0,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    bodyText2: TextStyle(
+    bodyText2: GoogleFonts.getFont('McLaren').copyWith(
       fontSize: 15.0,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     ),
-    subtitle1: TextStyle(
+    subtitle1: GoogleFonts.getFont('McLaren').copyWith(
       fontSize: 14.0,
       fontWeight: FontWeight.w600,
       color: Colors.white,

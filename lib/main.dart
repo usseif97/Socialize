@@ -8,10 +8,13 @@ import 'package:socialize/modules/authentication/login_screen.dart';
 import 'package:socialize/shared/bloc_observer.dart';
 import 'package:socialize/shared/components/constants.dart';
 import 'package:socialize/shared/cubit/home_cubit.dart';
+import 'package:socialize/shared/cubit/theme_cubit.dart';
+import 'package:socialize/shared/cubit/theme_states.dart';
 import 'package:socialize/shared/network/local/cache_helper.dart';
 import 'package:socialize/shared/styles/themes.dart';
 
 void main() async {
+  // Must be used if the main is async
   WidgetsFlutterBinding.ensureInitialized();
 
   // Intialize BlocObserver
@@ -20,13 +23,14 @@ void main() async {
   // Intialize Firebase
   await Firebase.initializeApp();
 
+  // Intialize Cache Helper
+  await CacheHelper.init();
+
   // unique ID for the application used with Cloud Messaging
   var token = await FirebaseMessaging.instance.getToken();
 
-  //FirebaseMessaging.onMessage.listen((event) {});
-
-  // Intialize Cache Helper
-  await CacheHelper.init();
+  // Theme mode
+  bool? isDark = CacheHelper.getData(key: 'isDark');
 
   // Start Screen
   Widget startWidget = LoginScreen();
@@ -34,29 +38,41 @@ void main() async {
   print('uID: $uID');
   if (uID != null) startWidget = HomeLayout();
 
-  runApp(MyApp(startWidget));
+  runApp(MyApp(isDark, startWidget));
 }
 
 class MyApp extends StatelessWidget {
+  final isDark;
   final startWidget;
-  MyApp(this.startWidget);
+  MyApp(this.isDark, this.startWidget);
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
+          // App Theme Provider
+          create: (context) => ThemeCubit()..changeAppMode(cache: isDark),
+        ),
+        BlocProvider(
             create: (context) => HomeCubit()
               ..getUserData()
               ..getPosts()),
       ],
-      child: MaterialApp(
-        title: 'Socialize',
-        theme: lightTheme,
-        darkTheme: darkTheme,
-        //themeMode: ThemeMode.dark,
-        debugShowCheckedModeBanner: false,
-        home: startWidget,
+      child: BlocConsumer<ThemeCubit, ThemeStates>(
+        listener: (context, states) {},
+        builder: (context, states) {
+          return MaterialApp(
+            title: 'Socialize',
+            theme: lightTheme,
+            darkTheme: darkTheme,
+            themeMode: ThemeCubit.get(context).isDark
+                ? ThemeMode.dark
+                : ThemeMode.light,
+            debugShowCheckedModeBanner: false,
+            home: startWidget,
+          );
+        },
       ),
     );
   }

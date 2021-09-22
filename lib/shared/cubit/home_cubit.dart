@@ -68,6 +68,7 @@ class HomeCubit extends Cubit<HomeStates> {
   ];
   void changeIndex(int index) {
     if (index == 1) getAllUsers();
+    if (index == 3) getAllUsers();
     if (index == 2)
       emit(HomeNewPostState());
     else {
