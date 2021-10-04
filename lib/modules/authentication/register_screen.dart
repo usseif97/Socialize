@@ -75,7 +75,7 @@ class RegisterScreen extends StatelessWidget {
                                   ),
                         ),
                         Text(
-                          'Register now to find new frineds',
+                          'Register now to have new frineds',
                           style:
                               Theme.of(context).textTheme.bodyText1!.copyWith(
                                     color: Colors.grey,
