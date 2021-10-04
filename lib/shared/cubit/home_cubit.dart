@@ -70,7 +70,7 @@ class HomeCubit extends Cubit<HomeStates> {
   void changeIndex(int index) {
     if (index == 1) getAllUsers();
     if (index == 3) getAllUsers();
-    if (index == 4) getUserPosts();
+    if (index == 4) getUserPosts(uID);
     if (index == 2)
       emit(HomeNewPostState());
     else {
@@ -377,12 +377,12 @@ class HomeCubit extends Cubit<HomeStates> {
 
   // get the user posts only
   late List<PostModel> userPosts;
-  void getUserPosts() {
+  void getUserPosts(id) {
     userPosts = [];
     emit(HomeGetUserPostsLoadingState());
     FirebaseFirestore.instance
         .collection(POSTS)
-        .where('uID', isEqualTo: uID)
+        .where('uID', isEqualTo: id)
         .get()
         .then((value) {
       value.docs.forEach((element) {

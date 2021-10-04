@@ -53,6 +53,7 @@ class UsersScreen extends StatelessWidget {
             context,
             UserScreen(userModel: model),
           );
+          HomeCubit.get(context).getUserPosts(model.uID);
         },
         child: Row(
           children: [
