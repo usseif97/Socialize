@@ -51,7 +51,7 @@ class EngagmentLayout extends StatelessWidget {
                     activeColor: Colors.purple,
                     iconSize: 20,
                     padding:
-                        EdgeInsets.symmetric(horizontal: 10.0, vertical: 12),
+                        EdgeInsets.symmetric(horizontal: 30.0, vertical: 12.0),
                     duration: Duration(milliseconds: 400),
                     tabBackgroundColor: Colors.grey[100]!,
                     color: Colors.black,

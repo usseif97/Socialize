@@ -15,6 +15,7 @@ import 'package:socialize/models/user_model.dart';
 import 'package:socialize/modules/chat/chat_screen.dart';
 import 'package:socialize/modules/feeds/feeds_screen.dart';
 import 'package:socialize/modules/post/new_post_screen.dart';
+import 'package:socialize/modules/profile/profile_screen.dart';
 import 'package:socialize/modules/settings/settings_screen.dart';
 import 'package:socialize/modules/users/users_screen.dart';
 import 'package:socialize/shared/components/constants.dart';
@@ -32,17 +33,17 @@ class HomeCubit extends Cubit<HomeStates> {
   int currentIndex = 0;
   List<String> titles = [
     'New Feed',
-    'Chat',
-    'New Post',
     'Friends',
-    'Settings',
+    'New Post',
+    'Chat',
+    'Profile',
   ];
   List<Widget> screens = [
     FeedsScreen(),
-    ChatScreen(),
-    NewPostScreen(),
     UsersScreen(),
-    SettingsScreen(),
+    NewPostScreen(),
+    ChatScreen(),
+    ProfileScreen(),
   ];
   List<GButton> bottomItems = [
     GButton(
@@ -50,25 +51,26 @@ class HomeCubit extends Cubit<HomeStates> {
       text: 'Home',
     ),
     GButton(
-      icon: IconBroken.Chat,
-      text: 'Chat',
-    ),
-    GButton(
-      icon: IconBroken.Paper_Upload,
-      text: 'Post',
-    ),
-    GButton(
       icon: IconBroken.User,
       text: 'Users',
     ),
     GButton(
-      icon: IconBroken.Setting,
-      text: 'Settings',
+      icon: IconBroken.Plus,
+      text: 'Post',
+    ),
+    GButton(
+      icon: IconBroken.Chat,
+      text: 'Chat',
+    ),
+    GButton(
+      icon: IconBroken.Profile,
+      text: 'Profile',
     ),
   ];
   void changeIndex(int index) {
     if (index == 1) getAllUsers();
     if (index == 3) getAllUsers();
+    if (index == 4) getUserPosts();
     if (index == 2)
       emit(HomeNewPostState());
     else {
@@ -86,6 +88,27 @@ class HomeCubit extends Cubit<HomeStates> {
   void userLogout() {
     emit(HomeLogoutLoadingState());
     FirebaseAuth.instance.signOut().then((value) {
+      UserModel model = UserModel(
+        name: userModel!.name,
+        bio: userModel!.bio,
+        phone: userModel!.phone,
+        password: userModel!.password,
+        email: userModel!.email,
+        cover: userModel!.cover,
+        image: userModel!.image,
+        uID: userModel!.uID,
+        isOnline: false,
+        isEmailVerified: false,
+      );
+      FirebaseFirestore.instance
+          .collection(USERS)
+          .doc(uID)
+          .update(model.toMap())
+          .then((value) {})
+          .catchError((error) {
+        emit(HomeUserUpdateErrorState(error.toString()));
+      });
+
       emit(HomeLogoutSuccessState());
     }).catchError((error) {
       emit(HomeLogoutErrorState(error.toString()));
@@ -99,7 +122,16 @@ class HomeCubit extends Cubit<HomeStates> {
     //print('uID: $uID');
     FirebaseFirestore.instance.collection(USERS).doc(uID).get().then((value) {
       userModel = UserModel.fromJson(value.data());
-      emit(HomeGetUserSuccessState());
+      userModel!.isOnline = true;
+      FirebaseFirestore.instance
+          .collection(USERS)
+          .doc(uID)
+          .update(userModel!.toMap())
+          .then((value) {
+        emit(HomeGetUserSuccessState());
+      }).catchError((error) {
+        emit(HomeUserUpdateErrorState(error.toString()));
+      });
     }).catchError((error) {
       emit(HomeGetUserErrorState(error.toString()));
     });
@@ -222,6 +254,7 @@ class HomeCubit extends Cubit<HomeStates> {
       cover: cover != null ? cover : userModel!.cover,
       image: image != null ? image : userModel!.image,
       uID: userModel!.uID,
+      isOnline: userModel!.isOnline,
       isEmailVerified: false,
     );
 
@@ -320,7 +353,11 @@ class HomeCubit extends Cubit<HomeStates> {
     likes = [];
     comments = [];
     emit(HomeGetPostsLoadingState());
-    FirebaseFirestore.instance.collection(POSTS).get().then((value) async {
+    FirebaseFirestore.instance
+        .collection(POSTS)
+        //.orderBy('date')
+        .get()
+        .then((value) async {
       value.docs.forEach((element) async {
         var elementLikes = await element.reference.collection(LIKES).get();
         var elementComments =
@@ -335,6 +372,25 @@ class HomeCubit extends Cubit<HomeStates> {
       });
     }).catchError((error) {
       emit(HomeGetPostsErrorState(error.toString()));
+    });
+  }
+
+  // get the user posts only
+  late List<PostModel> userPosts;
+  void getUserPosts() {
+    userPosts = [];
+    emit(HomeGetUserPostsLoadingState());
+    FirebaseFirestore.instance
+        .collection(POSTS)
+        .where('uID', isEqualTo: uID)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        userPosts.add(PostModel.fromJson(element.data()));
+      });
+      emit(HomeGetUserPostsSuccessState());
+    }).catchError((error) {
+      emit(HomeGetUserPostsErrorState(error.toString()));
     });
   }
 
@@ -372,8 +428,7 @@ class HomeCubit extends Cubit<HomeStates> {
         .collection(POSTS)
         .doc(postID)
         .collection(COMMENTS)
-        .doc(userModel!.uID)
-        .set(model.toMap())
+        .add(model.toMap())
         .then((value) {
       comments[index]++;
       emit(HomeCommentPostSuccessState());

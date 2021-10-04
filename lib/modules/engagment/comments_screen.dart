@@ -34,7 +34,7 @@ class CommentsScreen extends StatelessWidget {
   }
 
   Widget _buildItem(model, context) => Padding(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         child: Row(
           children: [
             CircleAvatar(

@@ -30,7 +30,7 @@ class ChatScreen extends StatelessWidget {
                         children: [
                           // Search
                           Container(
-                            padding: const EdgeInsets.all(5.0),
+                            padding: const EdgeInsets.all(10.0),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),
                               color: Colors.grey[200],
@@ -43,21 +43,24 @@ class ChatScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          SizedBox(height: 10.0),
+                          SizedBox(height: 15.0),
                           // Story
                           Container(
                             height: 90.0,
                             child: ListView.separated(
                               physics: BouncingScrollPhysics(),
-                              itemBuilder: (context, index) =>
-                                  _buildStoryItem(usersList[index]),
+                              itemBuilder: (context, index) {
+                                if (index == 0)
+                                  return _buildMyStory();
+                                else
+                                  return _buildStoryItem(usersList[index - 1]);
+                              },
                               separatorBuilder: (context, index) =>
                                   SizedBox(width: 5.0),
-                              itemCount: usersList.length,
+                              itemCount: usersList.length + 1,
                               scrollDirection: Axis.horizontal,
                             ),
                           ),
-                          SizedBox(height: 10.0),
                           // Chat
                           ListView.separated(
                             physics: NeverScrollableScrollPhysics(),
@@ -78,6 +81,32 @@ class ChatScreen extends StatelessWidget {
       },
     );
   }
+
+  Widget _buildMyStory() => Row(
+        children: [
+          Container(
+            width: 40.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 20.0,
+                  child: Icon(IconBroken.Plus),
+                ),
+                SizedBox(height: 5.0),
+                Text(
+                  'Add Your Story',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 8.0),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 10.0),
+        ],
+      );
 
   Widget _buildStoryItem(UserModel model) => Container(
         width: 60.0,
@@ -102,7 +131,8 @@ class ChatScreen extends StatelessWidget {
                   ),
                   child: CircleAvatar(
                     radius: 5.0,
-                    backgroundColor: Colors.green,
+                    backgroundColor:
+                        model.isOnline ? Colors.green : Colors.grey,
                   ),
                 ),
               ],
@@ -131,7 +161,7 @@ class ChatScreen extends StatelessWidget {
               alignment: AlignmentDirectional.bottomEnd,
               children: [
                 CircleAvatar(
-                  radius: 20.0,
+                  radius: 25.0,
                   backgroundImage: NetworkImage(model.image),
                 ),
                 CircleAvatar(
@@ -140,7 +170,7 @@ class ChatScreen extends StatelessWidget {
                 ),
                 CircleAvatar(
                   radius: 5.0,
-                  backgroundColor: Colors.green,
+                  backgroundColor: model.isOnline ? Colors.green : Colors.grey,
                 ),
               ],
             ),
@@ -159,7 +189,7 @@ class ChatScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          'Hello my name is Usseif',
+                          model.bio,
                           style: Theme.of(context).textTheme.caption,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -176,7 +206,7 @@ class ChatScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      Text('02:00 pm'),
+                      //Text('02:00 pm'),
                     ],
                   ),
                 ],

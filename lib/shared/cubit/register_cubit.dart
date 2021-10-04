@@ -53,10 +53,11 @@ class RegisterCubit extends Cubit<RegisterStates> {
       phone: phone,
       password: password,
       uID: uID,
-      bio: 'write your bio ..',
+      bio: 'I\'m Available ..',
       image:
           'https://appvital.com/images/profile/file-uploader-api-profile-avatar-2.jpg',
       cover: 'https://nanoguard.in/wp-content/uploads/2019/09/pic.jpg',
+      isOnline: true,
       isEmailVerified: false,
     );
 

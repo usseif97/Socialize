@@ -144,7 +144,7 @@ class FeedsScreen extends StatelessWidget {
                           ],
                         ),
                         Text(
-                          model.date,
+                          model.date.substring(0, 16),
                           style: Theme.of(context)
                               .textTheme
                               .caption!
@@ -301,7 +301,6 @@ class FeedsScreen extends StatelessWidget {
                 ],
               ),
               // Comments
-
               Padding(
                 padding: const EdgeInsetsDirectional.only(bottom: 10.0),
                 child: defaultSeperator(),
@@ -323,12 +322,14 @@ class FeedsScreen extends StatelessWidget {
                           border: InputBorder.none,
                         ),
                         onFieldSubmitted: (s) {
-                          HomeCubit.get(context).commentOnPost(
-                            HomeCubit.get(context).postsId[index],
-                            commentController.text,
-                            index,
-                          );
-                          commentController.text = '';
+                          if (s.trim().isNotEmpty) {
+                            HomeCubit.get(context).commentOnPost(
+                              HomeCubit.get(context).postsId[index],
+                              commentController.text,
+                              index,
+                            );
+                            commentController.text = '';
+                          }
                         },
                         controller: commentController,
                         maxLines: 1,
