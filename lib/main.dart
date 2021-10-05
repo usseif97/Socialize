@@ -57,7 +57,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(
             create: (context) => HomeCubit()
               ..getUserData()
-              ..getPosts()),
+              ..getPosts()
+              ..getStoriesUsers()),
       ],
       child: BlocConsumer<ThemeCubit, ThemeStates>(
         listener: (context, states) {},

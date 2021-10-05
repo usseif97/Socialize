@@ -156,3 +156,23 @@ class HomeSendMessageErrorState extends HomeStates {
 class HomeGetAllMessagesLoadingState extends HomeStates {}
 
 class HomeGetAllMessagesSuccessState extends HomeStates {}
+
+// Get Stories Users Data
+class HomeGetStoriesUsersLoadingState extends HomeStates {}
+
+class HomeGetStoriesUsersSuccessState extends HomeStates {}
+
+class HomeGetStoriesUsersErrorState extends HomeStates {
+  final String error;
+  HomeGetStoriesUsersErrorState(this.error);
+}
+
+// Get Stories For a User Data
+class HomeGetUserStoriesLoadingState extends HomeStates {}
+
+class HomeGetUserStoriesSuccessState extends HomeStates {}
+
+class HomeGetUserStoriesErrorState extends HomeStates {
+  final String error;
+  HomeGetUserStoriesErrorState(this.error);
+}

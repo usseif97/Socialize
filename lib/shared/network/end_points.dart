@@ -9,3 +9,9 @@ const COMMENTS = 'comments';
 const CHATS = 'chats';
 
 const MESSAGES = 'messages';
+
+const STORIES_USERS = 'stories_users';
+
+const STORIES = 'stories';
+
+const STORY = 'story';

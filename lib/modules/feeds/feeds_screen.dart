@@ -3,9 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:socialize/layout/engagmnet_layout.dart';
 import 'package:socialize/models/post_model.dart';
+import 'package:socialize/models/story_user_model.dart';
 import 'package:socialize/models/user_model.dart';
 import 'package:socialize/modules/post/new_post_screen.dart';
+import 'package:socialize/modules/stories/data.dart';
+import 'package:socialize/modules/stories/story_screen.dart';
 import 'package:socialize/shared/components/components.dart';
+import 'package:socialize/shared/components/constants.dart';
 import 'package:socialize/shared/cubit/home_cubit.dart';
 import 'package:socialize/shared/cubit/home_states.dart';
 import 'package:socialize/shared/styles/icon_broken.dart';
@@ -17,17 +21,50 @@ class FeedsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<HomeCubit, HomeStates>(
-      listener: (context, state) {},
+      listener: (context, state) {
+        if (state is HomeGetUserStoriesSuccessState)
+          navigateTo(
+            context,
+            StoryScreen(stories: HomeCubit.get(context).stories),
+          );
+      },
       builder: (context, state) {
         var userModel = HomeCubit.get(context).userModel;
         var posts = HomeCubit.get(context).posts;
+        var storiesUsers = HomeCubit.get(context).storiesUsers;
 
         return userModel != null && posts.length > 0
             ? SingleChildScrollView(
                 physics: BouncingScrollPhysics(),
                 child: Column(
                   children: [
+                    // Stories
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0,
+                        vertical: 5.0,
+                      ),
+                      child: Container(
+                        height: 100.0,
+                        child: ListView.separated(
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            if (index == 0) {
+                              return _buildMyStory();
+                            } else
+                              return _buildStoryItem(
+                                  storiesUsers[index - 1], context);
+                          },
+                          separatorBuilder: (context, index) =>
+                              SizedBox(width: 5.0),
+                          itemCount: storiesUsers.length + 1,
+                          scrollDirection: Axis.horizontal,
+                        ),
+                      ),
+                    ),
+                    //SizedBox(height: 20),
                     //if (model!.isEmailVerified == false) verificationBuilder(context),
+                    // What's in your mind ?
                     Padding(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10.0,
@@ -395,6 +432,71 @@ class FeedsScreen extends StatelessWidget {
                   }).catchError((error) {});
                 },
                 text: 'Send',
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Widget _buildMyStory() => Row(
+        children: [
+          Container(
+            width: 60.0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                CircleAvatar(
+                  radius: 30.0,
+                  child: Icon(IconBroken.Plus),
+                ),
+                SizedBox(height: 5.0),
+                Text(
+                  'Add Your Story',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 8.0),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 10.0),
+        ],
+      );
+
+  Widget _buildStoryItem(StoryUserModel model, BuildContext context) => InkWell(
+        onTap: () {
+          HomeCubit.get(context).getStoriesForUser(id: model.uID);
+        },
+        child: Container(
+          width: 68.0,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  CircleAvatar(
+                    radius: 34.0,
+                    backgroundColor: Colors.purple,
+                  ),
+                  CircleAvatar(
+                    radius: 32.0,
+                    backgroundColor: Colors.white,
+                  ),
+                  CircleAvatar(
+                    radius: 30.0,
+                    backgroundImage: NetworkImage(model.image),
+                  ),
+                ],
+              ),
+              SizedBox(height: 5.0),
+              Text(
+                model.name,
+                style: TextStyle(fontSize: 14.0),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
               ),
             ],
           ),

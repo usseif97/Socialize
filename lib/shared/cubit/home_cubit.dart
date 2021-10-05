@@ -11,6 +11,8 @@ import 'package:socialize/models/comment_model.dart';
 import 'package:socialize/models/like_model.dart';
 import 'package:socialize/models/message_model.dart';
 import 'package:socialize/models/post_model.dart';
+import 'package:socialize/models/story_model.dart';
+import 'package:socialize/models/story_user_model.dart';
 import 'package:socialize/models/user_model.dart';
 import 'package:socialize/modules/chat/chat_screen.dart';
 import 'package:socialize/modules/feeds/feeds_screen.dart';
@@ -516,6 +518,42 @@ class HomeCubit extends Cubit<HomeStates> {
         messages.add(MessageModel.fromJson(element.data()));
       });
       emit(HomeGetAllMessagesSuccessState());
+    });
+  }
+
+  // Get users that have stories
+  late List<StoryUserModel> storiesUsers = [];
+  void getStoriesUsers() {
+    if (storiesUsers.length == 0) {
+      emit(HomeGetStoriesUsersLoadingState());
+      FirebaseFirestore.instance.collection(STORIES_USERS).get().then((value) {
+        value.docs.forEach((element) {
+          storiesUsers.add(StoryUserModel.fromJson(element.data()));
+        });
+        emit(HomeGetStoriesUsersSuccessState());
+      }).catchError((error) {
+        emit(HomeGetStoriesUsersErrorState(error.toString()));
+      });
+    }
+  }
+
+  // Get the user stories
+  late List<StoryModel> stories = [];
+  void getStoriesForUser({required String id}) {
+    stories = [];
+    emit(HomeGetUserStoriesLoadingState());
+    FirebaseFirestore.instance
+        .collection(STORIES)
+        .doc(id)
+        .collection(STORY)
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
+        stories.add(StoryModel.fromJson(element.data()));
+        emit(HomeGetUserStoriesSuccessState());
+      });
+    }).catchError((error) {
+      emit(HomeGetUserStoriesErrorState(error.toString()));
     });
   }
 }
