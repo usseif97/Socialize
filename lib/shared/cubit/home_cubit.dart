@@ -524,6 +524,7 @@ class HomeCubit extends Cubit<HomeStates> {
   /* ********* STORIES *************** */
   // Get users that have stories
   late List<StoryUserModel> storiesUsers = [];
+  late List<StoryUserModel> sortedStoriesUsers = [];
   void getStoriesUsers() {
     if (storiesUsers.length == 0) {
       emit(HomeGetStoriesUsersLoadingState());
@@ -531,6 +532,15 @@ class HomeCubit extends Cubit<HomeStates> {
         value.docs.forEach((element) {
           storiesUsers.add(StoryUserModel.fromJson(element.data()));
         });
+        storiesUsers.forEach((element) {
+          if (element.uID == userModel!.uID) {
+            var x = storiesUsers[0];
+            var index = storiesUsers.indexOf(element);
+            storiesUsers[0] = element;
+            storiesUsers[index] = x;
+          }
+        });
+        sortedStoriesUsers.addAll(storiesUsers);
         emit(HomeGetStoriesUsersSuccessState());
       }).catchError((error) {
         emit(HomeGetStoriesUsersErrorState(error.toString()));
@@ -551,8 +561,8 @@ class HomeCubit extends Cubit<HomeStates> {
         .then((value) {
       value.docs.forEach((element) {
         stories.add(StoryModel.fromJson(element.data()));
-        emit(HomeGetUserStoriesSuccessState());
       });
+      emit(HomeGetUserStoriesSuccessState());
     }).catchError((error) {
       emit(HomeGetUserStoriesErrorState(error.toString()));
     });
@@ -617,10 +627,36 @@ class HomeCubit extends Cubit<HomeStates> {
         .collection(STORY)
         .add(model.toMap())
         .then((value) {
-      //getPosts();
       emit(HomeCreateNewStorySuccessState());
+      //addUserToStories();
     }).catchError((error) {
       emit(HomeCreateNewStoryErrorState(error.toString()));
     });
   }
+
+  // Add user to have stories
+  /*void addUserToStories() {
+    bool check = false; // default is the user have no story
+    storiesUsers.forEach((element) {
+      if (element.uID == userModel!.uID) check = true;
+    });
+    if (!check) {
+      emit(HomeAddUserToStoryLoadingState());
+      StoryUserModel model = StoryUserModel(
+        name: userModel!.name,
+        image: userModel!.image,
+        uID: userModel!.uID,
+      );
+      FirebaseFirestore.instance
+          .collection(STORIES_USERS)
+          .doc(userModel!.uID)
+          .set(model.toMap())
+          .then((value) {
+        emit(HomeAddUserToStorySuccessState());
+        getStoriesUsers();
+      }).catchError((error) {
+        emit(HomeAddUserToStoryErrorState(error.toString()));
+      });
+    }
+  }*/
 }

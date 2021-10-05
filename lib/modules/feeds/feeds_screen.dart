@@ -38,7 +38,7 @@ class FeedsScreen extends StatelessWidget {
       builder: (context, state) {
         var userModel = HomeCubit.get(context).userModel;
         var posts = HomeCubit.get(context).posts;
-        var storiesUsers = HomeCubit.get(context).storiesUsers;
+        var storiesUsers = HomeCubit.get(context).sortedStoriesUsers;
 
         return userModel != null && posts.length > 0
             ? SingleChildScrollView(
@@ -47,33 +47,34 @@ class FeedsScreen extends StatelessWidget {
                   children: [
                     // Progress Indicator
                     if (state is HomeCreateNewStoryLoadingState ||
-                        state is HomeStoryImageUploadSuccessState)
+                        state is HomeStoryImageUploadSuccessState ||
+                        state is HomeStoryImagePickedSuccessState)
                       LinearProgressIndicator(),
                     // Stories
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0,
-                        vertical: 5.0,
-                      ),
-                      child: Container(
-                        height: 100.0,
-                        child: ListView.separated(
-                          physics: BouncingScrollPhysics(),
-                          itemBuilder: (context, index) {
-                            if (index == 0) {
-                              return _buildMyStory(context);
-                            } else
-                              return _buildStoryItem(
-                                  storiesUsers[index - 1], context);
-                          },
-                          separatorBuilder: (context, index) =>
-                              SizedBox(width: 5.0),
-                          itemCount: storiesUsers.length + 1,
-                          scrollDirection: Axis.horizontal,
+                    if (storiesUsers.length > 0)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                          vertical: 5.0,
+                        ),
+                        child: Container(
+                          height: 100.0,
+                          child: ListView.separated(
+                            physics: BouncingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              if (index == 0) {
+                                return _buildMyStory(context);
+                              } else
+                                return _buildStoryItem(
+                                    storiesUsers[index - 1], context);
+                            },
+                            separatorBuilder: (context, index) =>
+                                SizedBox(width: 5.0),
+                            itemCount: storiesUsers.length + 1,
+                            scrollDirection: Axis.horizontal,
+                          ),
                         ),
                       ),
-                    ),
-                    //SizedBox(height: 20),
                     //if (model!.isEmailVerified == false) verificationBuilder(context),
                     // What's in your mind ?
                     Padding(
@@ -126,6 +127,7 @@ class FeedsScreen extends StatelessWidget {
                         width: double.infinity,
                       ),
                     ),*/
+                    // Posts
                     ListView.separated(
                       shrinkWrap: true,
                       physics: NeverScrollableScrollPhysics(),

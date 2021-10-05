@@ -202,3 +202,13 @@ class HomeCreateNewStoryErrorState extends HomeStates {
   final String error;
   HomeCreateNewStoryErrorState(this.error);
 }
+
+// Add User to have Story
+class HomeAddUserToStoryLoadingState extends HomeStates {}
+
+class HomeAddUserToStorySuccessState extends HomeStates {}
+
+class HomeAddUserToStoryErrorState extends HomeStates {
+  final String error;
+  HomeAddUserToStoryErrorState(this.error);
+}
