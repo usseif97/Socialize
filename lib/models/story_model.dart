@@ -9,6 +9,7 @@ class StoryModel {
   late int duration;
   late String userName;
   late String userImage;
+  late String date;
 
   StoryModel({
     required this.url,
@@ -16,6 +17,7 @@ class StoryModel {
     required this.duration,
     required this.userName,
     required this.userImage,
+    required this.date,
   });
 
   StoryModel.fromJson(Map<String, dynamic>? json) {
@@ -24,6 +26,7 @@ class StoryModel {
     duration = json['duration'];
     userName = json['userName'];
     userImage = json['userImage'];
+    date = json['date'];
   }
 
   Map<String, dynamic> toMap() {
@@ -33,6 +36,7 @@ class StoryModel {
       'duration': duration,
       'userName': userName,
       'userImage': userImage,
+      'date': date
     };
   }
 }

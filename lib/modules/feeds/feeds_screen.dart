@@ -27,6 +27,13 @@ class FeedsScreen extends StatelessWidget {
             context,
             StoryScreen(stories: HomeCubit.get(context).stories),
           );
+        if (state is HomeCreateNewStorySuccessState)
+          showSnackBar(
+            context: context,
+            content: 'Story have been added successfully',
+            label: 'Success',
+            state: snackBarStates.SUCCESS,
+          );
       },
       builder: (context, state) {
         var userModel = HomeCubit.get(context).userModel;
@@ -38,6 +45,10 @@ class FeedsScreen extends StatelessWidget {
                 physics: BouncingScrollPhysics(),
                 child: Column(
                   children: [
+                    // Progress Indicator
+                    if (state is HomeCreateNewStoryLoadingState ||
+                        state is HomeStoryImageUploadSuccessState)
+                      LinearProgressIndicator(),
                     // Stories
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -50,7 +61,7 @@ class FeedsScreen extends StatelessWidget {
                           physics: BouncingScrollPhysics(),
                           itemBuilder: (context, index) {
                             if (index == 0) {
-                              return _buildMyStory();
+                              return _buildMyStory(context);
                             } else
                               return _buildStoryItem(
                                   storiesUsers[index - 1], context);
@@ -438,30 +449,35 @@ class FeedsScreen extends StatelessWidget {
         ),
       );
 
-  Widget _buildMyStory() => Row(
-        children: [
-          Container(
-            width: 60.0,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CircleAvatar(
-                  radius: 30.0,
-                  child: Icon(IconBroken.Plus),
-                ),
-                SizedBox(height: 5.0),
-                Text(
-                  'Add Your Story',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 8.0),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+  Widget _buildMyStory(BuildContext context) => InkWell(
+        onTap: () {
+          HomeCubit.get(context).pickStoryImage();
+        },
+        child: Row(
+          children: [
+            Container(
+              width: 60.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  CircleAvatar(
+                    radius: 30.0,
+                    child: Icon(IconBroken.Plus),
+                  ),
+                  SizedBox(height: 5.0),
+                  Text(
+                    'Add Your Story',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 8.0),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-          SizedBox(width: 10.0),
-        ],
+            SizedBox(width: 10.0),
+          ],
+        ),
       );
 
   Widget _buildStoryItem(StoryUserModel model, BuildContext context) => InkWell(

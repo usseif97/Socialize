@@ -521,6 +521,7 @@ class HomeCubit extends Cubit<HomeStates> {
     });
   }
 
+  /* ********* STORIES *************** */
   // Get users that have stories
   late List<StoryUserModel> storiesUsers = [];
   void getStoriesUsers() {
@@ -554,6 +555,72 @@ class HomeCubit extends Cubit<HomeStates> {
       });
     }).catchError((error) {
       emit(HomeGetUserStoriesErrorState(error.toString()));
+    });
+  }
+
+  // handle new story image picker
+  File? storyImage;
+  Future<void> pickStoryImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      storyImage = File(pickedFile.path);
+      emit(HomeStoryImagePickedSuccessState());
+      uploadStoryImage(dateTime: DateTime.now().toString());
+    } else {
+      print('No image seleced !!');
+      emit(HomeStoryImagePickedErrorState('error'));
+    }
+  }
+
+  // handle new post image upload
+  void uploadStoryImage({
+    required String dateTime,
+  }) {
+    var imagePath = Uri.file(storyImage!.path).pathSegments.last;
+    firebase_storage.FirebaseStorage.instance
+        .ref()
+        .child('stories/$imagePath')
+        .putFile(storyImage!)
+        .then((value) {
+      value.ref.getDownloadURL().then((value) {
+        emit(HomeStoryImageUploadSuccessState());
+        createStory(
+          dateTime: dateTime,
+          storyImage: value,
+        );
+        //removePostImage();
+        //getPosts();
+      }).catchError((error) {
+        emit(HomeStoryImageUploadErrorState(error.toString()));
+      });
+    }).catchError((error) {
+      emit(HomePostImageUploadErrorState(error.toString()));
+    });
+  }
+
+  void createStory({
+    required String dateTime,
+    required String storyImage,
+  }) {
+    emit(HomeCreateNewStoryLoadingState());
+    StoryModel model = StoryModel(
+      url: storyImage,
+      duration: 5,
+      media: 'image',
+      userName: userModel!.name,
+      userImage: userModel!.image,
+      date: dateTime,
+    );
+    FirebaseFirestore.instance
+        .collection(STORIES)
+        .doc(userModel!.uID)
+        .collection(STORY)
+        .add(model.toMap())
+        .then((value) {
+      //getPosts();
+      emit(HomeCreateNewStorySuccessState());
+    }).catchError((error) {
+      emit(HomeCreateNewStoryErrorState(error.toString()));
     });
   }
 }

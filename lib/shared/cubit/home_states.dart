@@ -176,3 +176,29 @@ class HomeGetUserStoriesErrorState extends HomeStates {
   final String error;
   HomeGetUserStoriesErrorState(this.error);
 }
+
+// New Story Image Picker
+class HomeStoryImagePickedSuccessState extends HomeStates {}
+
+class HomeStoryImagePickedErrorState extends HomeStates {
+  final String error;
+  HomeStoryImagePickedErrorState(this.error);
+}
+
+// New Story Image Upload
+class HomeStoryImageUploadSuccessState extends HomeStates {}
+
+class HomeStoryImageUploadErrorState extends HomeStates {
+  final String error;
+  HomeStoryImageUploadErrorState(this.error);
+}
+
+// Create New Story
+class HomeCreateNewStoryLoadingState extends HomeStates {}
+
+class HomeCreateNewStorySuccessState extends HomeStates {}
+
+class HomeCreateNewStoryErrorState extends HomeStates {
+  final String error;
+  HomeCreateNewStoryErrorState(this.error);
+}

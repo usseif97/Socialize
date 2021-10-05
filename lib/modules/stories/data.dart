@@ -1,6 +1,6 @@
 import 'package:socialize/models/story_model.dart';
 
-final List<StoryModel> stories = [
+/*final List<StoryModel> stories = [
   StoryModel(
       url:
           'https://images.unsplash.com/photo-1534103362078-d07e750bd0c4?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80',
@@ -41,4 +41,4 @@ final List<StoryModel> stories = [
       duration: 8,
       userName: 'Usseif',
       userImage: 'https://wallpapercave.com/wp/AYWg3iu.jpg'),
-];
+];*/
