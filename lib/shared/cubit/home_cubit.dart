@@ -533,7 +533,7 @@ class HomeCubit extends Cubit<HomeStates> {
           storiesUsers.add(StoryUserModel.fromJson(element.data()));
         });
         storiesUsers.forEach((element) {
-          if (element.uID == userModel!.uID) {
+          if (element.uID == uID) {
             var x = storiesUsers[0];
             var index = storiesUsers.indexOf(element);
             storiesUsers[0] = element;

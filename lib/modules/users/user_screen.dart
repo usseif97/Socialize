@@ -116,44 +116,6 @@ class UserScreen extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      '5k',
-                                      style:
-                                          Theme.of(context).textTheme.subtitle1,
-                                    ),
-                                    Text(
-                                      'Followers',
-                                      style:
-                                          Theme.of(context).textTheme.caption,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: InkWell(
-                                onTap: () {},
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      '109',
-                                      style:
-                                          Theme.of(context).textTheme.subtitle1,
-                                    ),
-                                    Text(
-                                      'Following',
-                                      style:
-                                          Theme.of(context).textTheme.caption,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
                           ],
                         ),
                       ),

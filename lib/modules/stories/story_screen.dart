@@ -77,13 +77,13 @@ class _StoryScreenState extends State<StoryScreen>
                   case 'image':
                     return CachedNetworkImage(
                       imageUrl: story.url,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.fitWidth,
                     );
                   case 'video':
                     if (_videoController != null &&
                         _videoController!.value.isInitialized) {
                       return FittedBox(
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fitWidth,
                         child: SizedBox(
                           width: _videoController!.value.size.width,
                           height: _videoController!.value.size.height,
